@@ -1,38 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+### Broadcast Channel API
 
-## Getting Started
+브라우저 탭 또는 웹뷰 간에서 데이터를 주고 받을 채널을 생성하여, post-message와 message event-listener 기반으로 데이터를 주고 받을 수 있습니다.
+https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API
 
-First, run the development server:
+### useBroadcastChannel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+React에서 브라우저 탭 또는 웹뷰 간의 데이터를 주고 받을 수 있도록 기능을 제공하는 custom hook입니다.
+
+첫 번째 인자의 options 객체에 name 프로퍼티를 전달하면 해당 식별자를 가진 채널을 생성합니다.
+그 외에 broadcast-channel에 필요한 다양한 옵션들을 추가로 제어할 수 있습니다.
+https://github.com/pubkey/broadcast-channel
+
+```ts
+useBroadcastChannel({ name: BROADCAST_CHANNEL_NAME });
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+hook의 반환 객체의 sendMessage 함수를 사용하여 원하는 데이터를 해당 채널로 전달할 수 있습니다.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```ts
+const { sendMessage } = useBroadcastChannel({ name: BROADCAST_CHANNEL_NAME });
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+두 번째 인자의 callback 함수를 통해 다른 브라우저 탭으로부터 전달받은 값에 대한 별도의 처리를 할 수 있습니다.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```ts
+type BroadcastChannelData = {
+  count: number;
+};
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+const [count, setCount] = useState<number>(0);
 
-## Learn More
+useBroadcastChannel<BroadcastChannelData>({ name: BROADCAST_CHANNEL_NAME }, (data) => {
+  setCount(data.count);
+});
+```
+callback은 optional 하기 때문에, 필요에 따라 전달만 하거나, 전달 받기만 할 수도 있습니다.
 
-To learn more about Next.js, take a look at the following resources:
+### Result
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+https://user-images.githubusercontent.com/52942566/216793630-7e1ce94a-6b36-4818-9a12-9c874651685f.mov
